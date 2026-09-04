@@ -1,0 +1,21 @@
+id = "dev.herdr.codex-subagents"
+name = "Codex Subagent Splits"
+version = "0.1.1"
+min_herdr_version = "0.8.2"
+platforms = ["macos"]
+
+[[startup]]
+command = ["node", "index.cjs", "setup"]
+
+[[panes]]
+id = "subagent"
+title = "Codex subagent"
+placement = "split"
+command = ["node", "index.cjs", "view"]
+
+[[actions]]
+id = "prepare-uninstall"
+title = "Prepare uninstall"
+description = "Remove the Codex hooks installed by this plugin"
+contexts = ["global"]
+command = ["node", "index.cjs", "prepare-uninstall"]
