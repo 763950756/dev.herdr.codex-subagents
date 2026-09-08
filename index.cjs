@@ -88,7 +88,7 @@ function mergeOwnedHooks(document, command) {
   const definitions = [
     ['SessionStart', undefined, ownedHookHandler(command, 8)],
     ['SubagentStart', undefined, ownedHookHandler(command, 8)],
-    ['SubagentStop', undefined, ownedHookHandler(command, 30, true)],
+    ['SubagentStop', undefined, ownedHookHandler(command, CLOSE_DELAY_MS / 1_000 + 10, true)],
     ['PostToolUse', '(followup_task|resume_agent)$', ownedHookHandler(command, 8)],
   ];
   for (const [event, matcher, handler] of definitions) {

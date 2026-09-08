@@ -5,6 +5,7 @@ const { execFileSync } = require('node:child_process');
 const test = require('node:test');
 
 const {
+  CLOSE_DELAY_MS,
   HOOK_MARKER,
   agentPathFromThread,
   buildHookCommand,
@@ -53,8 +54,9 @@ test('Codex hooks merge idempotently and uninstall preserves third-party hooks',
   const postGroup = document.hooks.PostToolUse.find((group) =>
     group.hooks.some((handler) => handler.command === command));
   assert.equal(postGroup.matcher, '(followup_task|resume_agent)$');
-  assert.equal(document.hooks.SubagentStop.at(-1).hooks[0].async, true);
-  assert.equal(document.hooks.SubagentStop.at(-1).hooks[0].timeout, 30);
+  const stopHandler = document.hooks.SubagentStop.at(-1).hooks[0];
+  assert.equal(stopHandler.async, true);
+  assert.ok(stopHandler.timeout * 1_000 > CLOSE_DELAY_MS);
 
   stripOwnedHooks(document);
   assert.deepEqual(document, {
