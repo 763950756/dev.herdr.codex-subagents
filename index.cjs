@@ -12,7 +12,7 @@ const PLUGIN_ID = 'dev.herdr.codex-subagents';
 const PLUGIN_VERSION = '0.1.1';
 const PANE_ENTRYPOINT = 'subagent';
 const HOOK_MARKER = 'HERDR_CODEX_SUBAGENTS_V1';
-const CLOSE_DELAY_MS = 10_000;
+const CLOSE_DELAY_MS = 30_000;
 const STATE_VERSION = 1;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
