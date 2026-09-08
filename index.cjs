@@ -202,6 +202,7 @@ async function ensureSharedAppServer(codexBin, stateDir, env = process.env) {
     const managedCodex = path.join(home, 'packages', 'standalone', 'current', 'codex');
     if (fs.existsSync(managedCodex)) {
       const result = spawnSync(codexBin, ['app-server', 'daemon', 'start'], {
+        cwd: os.homedir(),
         encoding: 'utf8',
         timeout: 10_000,
         env: cleanDaemonEnvironment(env),
@@ -211,6 +212,7 @@ async function ensureSharedAppServer(codexBin, stateDir, env = process.env) {
     }
 
     const child = spawn(codexBin, ['app-server', '--listen', 'unix://'], {
+      cwd: os.homedir(),
       detached: true,
       stdio: 'ignore',
       env: cleanDaemonEnvironment(env),
