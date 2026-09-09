@@ -462,7 +462,7 @@ function ensureRoot(state, rootId, snapshot, cwd, preferredPaneId) {
   return root;
 }
 
-function ratioUpdates(root, managedIds) {
+function ratioUpdates(root, managedIds, force = false) {
   const updates = [];
   const visit = (node, nodePath) => {
     if (!node || node.type === 'pane') return managedIds.has(node?.pane_id) ? 1 : 0;
@@ -470,7 +470,9 @@ function ratioUpdates(root, managedIds) {
     const secondCount = visit(node.second, [...nodePath, true]);
     if (node.direction === 'down' && firstCount > 0 && secondCount > 0) {
       const ratio = firstCount / (firstCount + secondCount);
-      if (Math.abs(Number(node.ratio) - ratio) > 0.005) updates.push({ path: nodePath, ratio });
+      if (force || Math.abs(Number(node.ratio) - ratio) > 0.005) {
+        updates.push({ path: nodePath, ratio });
+      }
     }
     return firstCount + secondCount;
   };
@@ -478,12 +480,12 @@ function ratioUpdates(root, managedIds) {
   return updates;
 }
 
-async function rebalanceRoot(socketPath, root) {
+async function rebalanceRoot(socketPath, root, force = false) {
   if (!root?.paneId) return;
   const managed = new Set(Object.values(root.agents || {}).map((agent) => agent.paneId).filter(Boolean));
   if (managed.size < 2) return;
   const exported = await herdrRequest(socketPath, 'layout.export', { pane_id: root.paneId });
-  for (const update of ratioUpdates(exported.layout.root, managed)) {
+  for (const update of ratioUpdates(exported.layout.root, managed, force)) {
     await herdrRequest(socketPath, 'layout.set_split_ratio', {
       tab_id: exported.layout.tab_id,
       path: update.path,
@@ -527,7 +529,8 @@ async function openAgentPane(context, state, rootId, agentId, agentPath, cwd, sn
     },
   });
   agent.paneId = result.plugin_pane.pane.pane_id;
-  try { await rebalanceRoot(context.socketPath, root); }
+  // Herdr 0.9.0 needs a layout ratio write to refresh PTY geometry after plugin splits.
+  try { await rebalanceRoot(context.socketPath, root, true); }
   catch (error) { appendLog(context.stateDir, `rebalance after open failed: ${error.message}`); }
   return agent.paneId;
 }

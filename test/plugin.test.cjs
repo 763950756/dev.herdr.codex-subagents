@@ -176,6 +176,20 @@ test('nested down splits rebalance managed panes to equal heights', () => {
   ]);
 });
 
+test('rebalance can force unchanged ratios to refresh pane geometry', () => {
+  const layout = {
+    type: 'split',
+    direction: 'down',
+    ratio: 0.5,
+    first: { type: 'pane', pane_id: 'a' },
+    second: { type: 'pane', pane_id: 'b' },
+  };
+  const managed = new Set(['a', 'b']);
+
+  assert.deepEqual(ratioUpdates(layout, managed), []);
+  assert.deepEqual(ratioUpdates(layout, managed, true), [{ path: [], ratio: 0.5 }]);
+});
+
 test('reactivation names and close generations reject stale timers', () => {
   assert.equal(reactivationTarget({
     tool_name: 'collaborationfollowup_task',
