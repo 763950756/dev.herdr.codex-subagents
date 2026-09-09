@@ -477,13 +477,16 @@ function ratioUpdates(root, managedIds, force = false) {
     return firstCount + secondCount;
   };
   visit(root, []);
+  if (force && updates.length === 0 && root?.type === 'split') {
+    updates.push({ path: [], ratio: Number(root.ratio) });
+  }
   return updates;
 }
 
 async function rebalanceRoot(socketPath, root, force = false) {
   if (!root?.paneId) return;
   const managed = new Set(Object.values(root.agents || {}).map((agent) => agent.paneId).filter(Boolean));
-  if (managed.size < 2) return;
+  if (managed.size === 0 || (!force && managed.size < 2)) return;
   const exported = await herdrRequest(socketPath, 'layout.export', { pane_id: root.paneId });
   for (const update of ratioUpdates(exported.layout.root, managed, force)) {
     await herdrRequest(socketPath, 'layout.set_split_ratio', {

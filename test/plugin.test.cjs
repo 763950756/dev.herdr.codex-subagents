@@ -190,6 +190,20 @@ test('rebalance can force unchanged ratios to refresh pane geometry', () => {
   assert.deepEqual(ratioUpdates(layout, managed, true), [{ path: [], ratio: 0.5 }]);
 });
 
+test('rebalance forces the root split to refresh the first managed pane', () => {
+  const layout = {
+    type: 'split',
+    direction: 'right',
+    ratio: 0.5,
+    first: { type: 'pane', pane_id: 'main' },
+    second: { type: 'pane', pane_id: 'a' },
+  };
+  const managed = new Set(['a']);
+
+  assert.deepEqual(ratioUpdates(layout, managed), []);
+  assert.deepEqual(ratioUpdates(layout, managed, true), [{ path: [], ratio: 0.5 }]);
+});
+
 test('reactivation names and close generations reject stale timers', () => {
   assert.equal(reactivationTarget({
     tool_name: 'collaborationfollowup_task',
